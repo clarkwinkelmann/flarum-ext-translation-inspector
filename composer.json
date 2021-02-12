@@ -1,0 +1,40 @@
+{
+    "name": "clarkwinkelmann/flarum-ext-translation-inspector",
+    "description": "Enable forum users to find details about translations",
+    "keywords": [
+        "flarum"
+    ],
+    "type": "flarum-extension",
+    "license": "MIT",
+    "require": {
+        "flarum/core": ">=0.1.0-beta.15 <0.1.0-beta.16",
+        "ext-json": "*"
+    },
+    "authors": [
+        {
+            "name": "Clark Winkelmann",
+            "email": "clark.winkelmann@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/clarkwinkelmann/flarum-ext-translation-inspector/issues",
+        "source": "https://github.com/clarkwinkelmann/flarum-ext-translation-inspector"
+    },
+    "autoload": {
+        "psr-4": {
+            "ClarkWinkelmann\\TranslationInspector\\": "src/"
+        }
+    },
+    "extra": {
+        "flarum-extension": {
+            "title": "Translation Inspector",
+            "category": "language",
+            "icon": {
+                "name": "fas fa-highlighter",
+                "backgroundColor": "#684ba6",
+                "color": "#fff"
+            }
+        }
+    }
+}
