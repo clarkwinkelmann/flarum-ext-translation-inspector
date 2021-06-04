@@ -4,16 +4,17 @@
 
 Enable forum users to find details about translations.
 
-This is an early version of the extension. A future update will allow coupling with a report feature.
+Features:
 
-Current features:
-
-- A link in the sidebar enables "inspect" mode
+- A link in the session dropdown enables "inspect" mode
 - When "inspect" mode is active, all translatable texts are highlighted
-- Clicking on a text brings up a modal with details about the translation key, which extension provides it and a link to the source file if it's on GitHub
-- The feature is protected by a permission, but the link is currently visible to everyone all the time
+- Clicking on a text brings up a modal with details about the translation key, which extension provides it, and a link to the source file if it's on GitHub
+- If you are in a context where you cannot click the inspect button (for example as guest or inside a modal), you can run `startTranslationInspection()` from the browser console
 
-> Caution: if you have private extensions or local extenders installed, this extension could expose their repository URLs, names, icons or relative paths to some of their yaml files
+> Caution: if you have private extensions or local extenders installed, this extension could expose their repository URLs, names, icons or relative paths to some of their yaml files to users with the Inspect permission!
+
+With the current feature set it probably doesn't make much sense to install this extension on a production forum.
+It is more meant as a developer tool.
 
 ## Installation
 
@@ -34,3 +35,4 @@ Support is offered on a "best effort" basis through the Flarum community thread.
 
 - [GitHub](https://github.com/clarkwinkelmann/flarum-ext-translation-inspector)
 - [Packagist](https://packagist.org/packages/clarkwinkelmann/flarum-ext-translation-inspector)
+- [Discuss](https://discuss.flarum.org/d/26192)

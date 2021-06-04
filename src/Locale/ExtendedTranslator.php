@@ -3,12 +3,13 @@
 namespace ClarkWinkelmann\TranslationInspector\Locale;
 
 use Flarum\Locale\Translator;
+use Symfony\Component\Translation\MessageCatalogueInterface;
 use Symfony\Component\Translation\MetadataAwareInterface;
 
 /**
  * We need to load the translations again with our custom loader
  * Problems are:
- * - The resources are private, so there's no way to get them our or Flarum's Translator
+ * - The resources are private, so there's no way to get them out of Flarum's Translator
  * - The cache path is private and cannot be modified, and clearing the cache isn't a viable option for performance
  *
  * As a workaround, manually call the method that loads the resources and then retrieve the catalogue
@@ -41,6 +42,7 @@ class ExtendedTranslator extends Translator
          */
         $catalogue = $this->translator->getCatalogue($locale);
 
-        return $catalogue->getMetadata($key);
+        // Flarum loads all translations in the INTL domain so that's where the meta will be available
+        return $catalogue->getMetadata($key, 'messages' . MessageCatalogueInterface::INTL_DOMAIN_SUFFIX);
     }
 }

@@ -1,7 +1,8 @@
 .TranslationInspectorTooltip {
-    position: absolute;
-    top: 60px;
-    left: 20px;
+    position: fixed;
+    z-index: 1000;
+    bottom: 20px;
+    right: 20px;
     background: @hero-bg;
     color: @hero-color;
     padding: 15px;
@@ -57,6 +58,12 @@
     border-radius: 6px;
     margin-right: 10px;
     margin-top: 5px;
+
+    .icon {
+        display: block;
+        text-align: center;
+        margin-top: 8px;
+    }
 }
 
 .TranslationInspectorExtensionTitle {

@@ -2,7 +2,7 @@ clarkwinkelmann-translation-inspector:
     admin:
         permissions:
             inspect: Inspect translations
-    forum:
+    lib:
         modal:
             title: Translation Inspector
             key: Translation key

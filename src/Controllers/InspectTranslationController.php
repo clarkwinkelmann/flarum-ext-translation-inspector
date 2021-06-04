@@ -5,7 +5,9 @@ namespace ClarkWinkelmann\TranslationInspector\Controllers;
 use ClarkWinkelmann\TranslationInspector\Locale\ExtendedTranslator;
 use Flarum\Extension\Extension;
 use Flarum\Extension\ExtensionManager;
+use Flarum\Foundation\Application;
 use Flarum\Foundation\Paths;
+use Flarum\Http\RequestUtil;
 use Flarum\Locale\Translator;
 use Illuminate\Contracts\Validation\Factory;
 use Illuminate\Support\Arr;
@@ -31,14 +33,14 @@ class InspectTranslationController implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $request->getAttribute('actor')->assertCan('clarkwinkelmann-translation-inspector.inspect');
+        RequestUtil::getActor($request)->assertCan('clarkwinkelmann-translation-inspector.inspect');
 
         $key = Arr::get($request->getQueryParams(), 'key');
 
         $this->validation->make([
             'key' => $key,
         ], [
-            'key' => ['required', 'regex:~^[A-Za-z0-9_-]+\.(forum|admin)\.~'],
+            'key' => ['required', 'regex:~^[A-Za-z0-9_-]+\.(forum|admin|lib)\.~'],
         ])->validate();
 
         $englishText = $this->translator->trans($key, [], null, 'en');
@@ -63,6 +65,8 @@ class InspectTranslationController implements RequestHandlerInterface
         if (preg_match('~^/([A-Za-z0-9_-]+/[A-Za-z0-9_-]+)/(.+\.ya?ml)$~', $pathInVendor, $matches) === 1) {
             $packageName = $matches[1];
             $yamlFilePathInPackage = $matches[2];
+            $sourceUrl = null;
+            $version = null;
 
             /**
              * @var Extension $extension
@@ -83,14 +87,33 @@ class InspectTranslationController implements RequestHandlerInterface
                 ];
 
                 $sourceUrl = $extension->composerJsonAttribute('source.url');
+                $version = $extension->getVersion();
+            }
 
-                if (preg_match('~^(https://github\.com/[A-Za-z0-9_-]+/[A-Za-z0-9_-]+)(\.git)?$~', $sourceUrl, $matches) === 1) {
-                    $line = $this->findLineNumber($path, $key);
+            // We need a special handle for core since it's not an extension
+            if ($packageName === 'flarum/core') {
+                $inspection['extension'] = [
+                    'name' => 'flarum/core',
+                    'title' => 'Flarum Core',
+                    'icon' => [],
+                ];
 
-                    $inspection['url'] = $matches[1] . '/blob/master/' . $yamlFilePathInPackage . ($line ? '#L' . $line : '');
+                $inspection['file'] = [
+                    'path' => $yamlFilePathInPackage,
+                ];
 
-                    $inspection['file']['line'] = $line;
-                }
+                $sourceUrl = 'https://github.com/flarum/core';
+                $version = 'v' . Application::VERSION;
+            }
+
+            if ($sourceUrl && preg_match('~^(https://github\.com/[A-Za-z0-9_-]+/[A-Za-z0-9_-]+)(\.git)?$~', $sourceUrl, $matches) === 1) {
+                $line = $this->findLineNumber($path, $key);
+
+                $version = str_replace(['-dev', 'dev-'], '', $version) ?: 'master';
+
+                $inspection['url'] = $matches[1] . '/blob/' . $version . '/' . $yamlFilePathInPackage . ($line ? '#L' . $line : '');
+
+                $inspection['file']['line'] = $line;
             }
         }
 
@@ -104,8 +127,8 @@ class InspectTranslationController implements RequestHandlerInterface
      * - That the provided key is present in the file
      * - That every key is has its own line
      * - That the indentation is constant across the full file
-     * @param $filename
-     * @param $key
+     * @param string $filename
+     * @param string $key
      * @return int|null
      */
     protected function findLineNumber(string $filename, string $key): ?int
